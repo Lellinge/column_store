@@ -30,6 +30,7 @@ class Column  {
     void write(Tuple tuple) {
         auto write_ret = ::write(fd_int, &tuple, 16);
         std::cout << "write_ret : " << write_ret << std::endl;
+        // write gibt die anzahl an geschriebenen bytes zurück. es sollten immer 16 sein.
         if (write_ret != 16) {
             std::cout << "error with writing." << std::endl;
         }
@@ -45,16 +46,19 @@ class Column  {
 
 public:
     Column(const std::string& name) {
-        this->fd = fopen(("../store/" + name).c_str(), "a+");
-        // TODO apparently SEEK_END is not required, so replace this to using the length of the file
         this->name = name;
         // -1 = not yet calculated
         this->last_id = -1;
 
 
-        this->fd_int = open("../store/score", O_RDWR | O_APPEND);
+        this->fd_int = open(("../store/" + name).c_str(), O_RDWR | O_APPEND);
         struct stat statbuf;
         int error = fstat(this->fd_int, &statbuf);
+        if (error == -1) {
+            std::cout << strerror(errno) << std::endl;
+            std::cout << "fstat failed." << std::endl;
+        }
+
         this->mapped = mmap(nullptr, statbuf.st_size, PROT_READ , MAP_SHARED, fd_int, 0);
         if (mapped == MAP_FAILED) {
             std::cout << std::strerror(errno) << std::endl;
@@ -67,6 +71,7 @@ public:
     }
 
     void read_all() {
+        std::cout << "id\tvalue" << std::endl;
         auto *mapped_int64 = (std::int64_t *) mapped;
         for (int i = 0; i <= last_id; ++i) {
             std:int64_t id = *(mapped_int64 + (i * 2));
