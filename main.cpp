@@ -6,43 +6,6 @@
 #include <unistd.h>
 
 
-bool already_load_columns = true;
-
-void map_file(std::string name) {
-    // TODO make this have configurable path and create them if it doesnt exists yet.
-    int fd;
-    fd = open("../store/score", O_RDWR);
-    if (fd < 0) {
-        std::cout << "couldnt open file" << std::endl;
-        std::cout << errno << std::endl;
-        std::cout << std::strerror(errno) << std::endl;
-        return;
-    }
-    std::cout << fd << std::endl;
-    std::cout << "Hello, World!" << std::endl;
-    struct stat statbuf;
-    int err = fstat(fd, &statbuf);
-    void *mapped = mmap(0, statbuf.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (mapped == MAP_FAILED) {
-        std::cout << std::strerror(errno) << std::endl;
-        std::cout << "failed to mmap " << std::endl;
-        return;
-    }
-    auto *mapped_int64 = (std::int64_t *) mapped;
-    auto length = statbuf.st_size;
-    // TODO make the code handle tuples with other datatypes
-    // 1 id + 1 value is 8 + 8 = 16 bytes
-    auto iterations = statbuf.st_size / 16;
-    std::cout << "reading from file" << std::endl;
-    for (int i = 0; i < iterations; ++i) {
-        std::cout << "first iteration" << std::endl;
-        std:int64_t id = *(mapped_int64 + (i * 16));
-        std::cout << id << std::endl;
-        std::int64_t value = *(mapped_int64 + 1 + i * 16);
-        std::cout << value  << std::endl;
-    }
-
-}
 
 class Tuple {
 public:
@@ -144,15 +107,5 @@ void repl_loop() {
 
 int main() {
     repl_loop();
-    if (not already_load_columns) {
-        FILE *fd;
-        fd = fopen("../store/score", "r+");
-        Tuple test_tuple(0, 5);
-        size_t ret;
-        ret = fwrite(&test_tuple, 16, 1, fd);
-        std::cout << ret << std::endl;
-        fclose(fd);
-    }
-    map_file("score");
     return 0;
 }
