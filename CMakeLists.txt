@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.25)
 project(column_store)
 set(CMAKE_CXX_STANDARD 20)
 
@@ -7,6 +7,13 @@ FetchContent_Declare(
         googletest
         URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
+
+IF (WIN32)
+    # For Windows: Prevent overriding the parent project's compiler/linker settings
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+ELSE ()
+
+ENDIF ()
 
 FetchContent_MakeAvailable(googletest)
 
