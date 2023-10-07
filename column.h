@@ -61,9 +61,7 @@ class Column  {
         auto length_tuple = sizeof(std::int64_t) + sizeof(T);
         auto offset = id * length_tuple;
         std::int8_t* address_of_id = mapped_cast + offset;
-        std::cout << "addres of id is: " << address_of_id << std::endl;
         auto addres_of_id_cast = (std::int64_t *) address_of_id;
-        std::cout << "id is: " << id << " and reading: " << *addres_of_id_cast << std::endl;
         auto address_of_value = addres_of_id_cast + 1;
         T* value = ((T* ) address_of_value);
         return value;
@@ -101,7 +99,6 @@ public:
         // TODO make work with templates
         std::cout << "id\tvalue" << std::endl;
         auto length_tuple = sizeof(T) + sizeof(std::int64_t);
-        std::cout << "length tuple: " << length_tuple << std::endl;
         for (int i = 0; i <= last_id; ++i) {
             std::cout << i << "\t";
             std::cout << this->value_at_id(i) << std::endl;
@@ -121,6 +118,10 @@ public:
         } else {
             return -1;
         }
+    }
+
+    std::int64_t get_last_id() {
+        return this->last_id;
     }
 };
 

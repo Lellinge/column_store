@@ -17,7 +17,9 @@ public:
 
     std::int64_t insert_values(std::int64_t value_1, double value_2);
 
-    void read_all()
+    void read_all();
+
+    std::pair<std::int64_t, double> read_value(std::int64_t id);
 };
 
 
