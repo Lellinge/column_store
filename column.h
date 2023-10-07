@@ -27,6 +27,7 @@ public:
     T value;
 };
 
+template<typename T>
 class Column  {
     FILE* fd;
     std::string name;
@@ -36,10 +37,11 @@ class Column  {
     int fd_int;
     void* mapped;
 
-    bool write(Tuple<std::int64_t> tuple) {
-        auto write_ret = ::write(fd_int, &tuple, 16);
+    bool write(Tuple<T> tuple) {
+        auto size_tuple = sizeof(std::int64_t) + sizeof(T);
+        auto write_ret = ::write(fd_int, &tuple, size_tuple);
         // write gibt die anzahl an geschriebenen bytes zurück. es sollten immer 16 sein.
-        if (write_ret != 16) {
+        if (write_ret != size_tuple) {
             std::cout << "error with writing." << std::endl;
             return false;
         }
@@ -54,6 +56,18 @@ class Column  {
     }
 
 
+    T* value_at_id(std::int64_t id) {
+        auto *mapped_cast = (std::int8_t* ) mapped;
+        auto length_tuple = sizeof(std::int64_t) + sizeof(T);
+        auto offset = id * length_tuple;
+        std::int8_t* address_of_id = mapped_cast + offset;
+        std::cout << "addres of id is: " << address_of_id << std::endl;
+        auto addres_of_id_cast = (std::int64_t *) address_of_id;
+        std::cout << "id is: " << id << " and reading: " << *addres_of_id_cast << std::endl;
+        auto address_of_value = addres_of_id_cast + 1;
+        T* value = ((T* ) address_of_value);
+        return value;
+    }
 
 public:
     Column(const std::string& name) {
@@ -76,29 +90,38 @@ public:
             std::cout << "failed to mmap " << std::endl;
             return;
         }
-        int length = statbuf.st_size / 16;
+        auto length_tuple = sizeof(std::int64_t) + sizeof(T);
+        int length = statbuf.st_size / length_tuple;
         // ids start at 0
         this->last_id = length - 1;
     }
 
+
     void read_all() {
+        // TODO make work with templates
         std::cout << "id\tvalue" << std::endl;
-        auto *mapped_int64 = (std::int64_t *) mapped;
+        auto length_tuple = sizeof(T) + sizeof(std::int64_t);
+        std::cout << "length tuple: " << length_tuple << std::endl;
+        auto *mapped_cast = (std::int8_t *) mapped;
         for (int i = 0; i <= last_id; ++i) {
-            std:int64_t id = *(mapped_int64 + (i * 2));
+            std::cout << i << "\t";
+            std::cout << this->value_at_id(i) << std::endl;
+            /*auto addres_of_id = mapped_cast + (i * length_tuple);
+            auto id_pointer = (std::int64_t *) addres_of_id;
+            std:int64_t id = *id_pointer;
             std::cout << id << "\t";
-            std::int64_t value = *(mapped_int64 + 1 + i * 2);
-            std::cout << value  << std::endl;
+            auto address_of_value = addres_of_id + sizeof(std::int64_t);
+            T value = *((T *) address_of_value);
+            std::cout << value  << std::endl;*/
         }
     }
 
     // TODO make it handle invalid ids
-    std::int64_t read_value(std::int64_t id) {
-        auto *mapped_int64 = (std::int64_t *) mapped;
-        return *(mapped_int64 + 1 + id * 2);
+    T read_value(std::int64_t id) {
+        return *value_at_id(id);
     }
 
-    std::int64_t write_value(std::int64_t value) {
+    std::int64_t write_value(T value) {
         Tuple new_tuple(last_id + 1, value);
         bool worked = this->write(new_tuple);
         if (worked) {
