@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "column.h"
+#include "table.h"
 
 
 bool is_number(const std::string &s) {

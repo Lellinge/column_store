@@ -102,17 +102,9 @@ public:
         std::cout << "id\tvalue" << std::endl;
         auto length_tuple = sizeof(T) + sizeof(std::int64_t);
         std::cout << "length tuple: " << length_tuple << std::endl;
-        auto *mapped_cast = (std::int8_t *) mapped;
         for (int i = 0; i <= last_id; ++i) {
             std::cout << i << "\t";
             std::cout << this->value_at_id(i) << std::endl;
-            /*auto addres_of_id = mapped_cast + (i * length_tuple);
-            auto id_pointer = (std::int64_t *) addres_of_id;
-            std:int64_t id = *id_pointer;
-            std::cout << id << "\t";
-            auto address_of_value = addres_of_id + sizeof(std::int64_t);
-            T value = *((T *) address_of_value);
-            std::cout << value  << std::endl;*/
         }
     }
 
