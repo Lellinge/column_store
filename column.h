@@ -91,9 +91,20 @@ public:
         }
     }
 
-    bool write_value(std::int64_t value) {
+    // TODO make it handle invalid ids
+    std::int64_t read_value(std::int64_t id) {
+        auto *mapped_int64 = (std::int64_t *) mapped;
+        return *(mapped_int64 + 1 + id * 2);
+    }
+
+    std::int64_t write_value(std::int64_t value) {
         Tuple new_tuple(last_id + 1, value);
-        return this->write(new_tuple);
+        bool worked = this->write(new_tuple);
+        if (worked) {
+            return this->last_id;
+        } else {
+            return -1;
+        }
     }
 };
 
