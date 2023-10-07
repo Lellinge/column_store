@@ -15,15 +15,16 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+template <typename T>
 class Tuple {
 public:
-    Tuple(std::int64_t id, std::int64_t value) {
+    Tuple(std::int64_t id, T value) {
         this->id = id;
         this->value = value;
     }
 
     std::int64_t id;
-    std::int64_t value;
+    T value;
 };
 
 class Column  {
@@ -35,7 +36,7 @@ class Column  {
     int fd_int;
     void* mapped;
 
-    bool write(Tuple tuple) {
+    bool write(Tuple<std::int64_t> tuple) {
         auto write_ret = ::write(fd_int, &tuple, 16);
         // write gibt die anzahl an geschriebenen bytes zurück. es sollten immer 16 sein.
         if (write_ret != 16) {
