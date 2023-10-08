@@ -11,8 +11,8 @@
 
 
 class Table {
-    std::pair<Column<std::int64_t>, Column<double>> columns;
 public:
+    std::pair<column::Column<std::int64_t>, column::Column<double>> columns;
     Table();
 
     std::int64_t insert_values(std::int64_t value_1, double value_2);

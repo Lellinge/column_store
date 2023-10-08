@@ -4,12 +4,12 @@
 
 #include "table.h"
 
-Table::Table(): columns(Column<std::int64_t>("table_int64"), Column<double>("table_double")) {
+Table::Table(): columns(column::Column<std::int64_t>("table_int64"), column::Column<double>("table_double")) {
 }
 
 std::int64_t Table::insert_values(std::int64_t value_1, double value_2) {
-    std::int64_t id_1 = columns.first.write_value(value_1);
-    std::int64_t id_2 = columns.second.write_value(value_2);
+    std::int64_t id_1 = column::write_value<std::int64_t>(columns.first, value_1);
+    std::int64_t id_2 = column::write_value<double>(columns.second, value_2);
     if (id_1 == id_2) {
         return id_1;
     } else {
@@ -28,8 +28,8 @@ void Table::read_all() {
 
     std::cout << "id\t\tvalue_1\t\tvalue_2" << std::endl;
     for (int i = 0; i < last_id_1; ++i) {
-        auto value_1 = columns.first.read_value(i);
-        auto value_2 = columns.second.read_value(i);
+        auto value_1 = column::read_value<std::int64_t>(columns.first, i);
+        double value_2 = column::read_value<double>(columns.second, i);
 
         std::cout << i;
         std::cout << "\t\t" << value_1;
@@ -39,7 +39,7 @@ void Table::read_all() {
 }
 
 std::pair<std::int64_t, double> Table::read_value(std::int64_t id) {
-    auto value_1 = columns.first.read_value(id);
-    auto value_2 = columns.second.read_value(id);
+    auto value_1 = column::read_value<std::int64_t>(columns.first, id);
+    auto value_2 = column::read_value<double>(columns.second, id);
     return std::pair<std::int64_t ,double>{value_1, value_2};
 }
