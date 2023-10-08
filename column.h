@@ -29,8 +29,16 @@ namespace column {
         T value;
     };
 
+    // TODO evtl mehr, mal schauen
+    enum COLUMN_DATATYPES {
+        INT_64,
+        FLOAT_64,
+        INT_32,
+        FLOAT_32,
+        INT_8
+    };
 
-    template<typename T>
+
     class Column {
     public:
         FILE *fd;
@@ -41,8 +49,12 @@ namespace column {
         int fd_int;
         void *mapped;
 
+        COLUMN_DATATYPES type;
 
-        Column(const std::string &name) {
+
+        Column(const std::string &name, COLUMN_DATATYPES type) {
+            this->type = type;
+
             this->name = name;
             // -1 = not yet calculated
             this->last_id = -1;
@@ -62,20 +74,40 @@ namespace column {
                 std::cout << "failed to mmap " << std::endl;
                 return;
             }
-            auto length_tuple = sizeof(std::int64_t) + sizeof(T);
+            auto length_tuple = sizeof(std::int64_t);
+            switch (type) {
+
+                case INT_64:
+                    length_tuple += sizeof(std::int64_t);
+                    break;
+                case FLOAT_64:
+                    length_tuple += sizeof(double);
+                    break;
+                case INT_32:
+                    length_tuple += sizeof(std::int32_t);
+                    break;
+                case FLOAT_32:
+                    length_tuple += sizeof(float);
+                    break;
+                case INT_8:
+                    length_tuple += sizeof(char);
+                    break;
+                default:
+                    std::cout << "unknown datatype, please implement length at:" << __LINE__ << std::endl;
+            }
             int length = statbuf.st_size / length_tuple;
             // ids start at 0
             this->last_id = length - 1;
         }
 
 
-        std::int64_t get_last_id() {
+        [[nodiscard]] std::int64_t get_last_id() const {
             return this->last_id;
         }
     };
 
     template<typename T>
-    bool write(Column<T>& column1, Tuple<T> tuple) {
+    bool write(Column& column1, Tuple<T> tuple) {
         auto size_tuple = sizeof(std::int64_t) + sizeof(T);
         auto write_ret = ::write(column1.fd_int, &tuple, size_tuple);
         // write gibt die anzahl an geschriebenen bytes zurück. es sollten immer 16 sein.
@@ -94,7 +126,7 @@ namespace column {
     }
 
     template<typename T>
-    std::int64_t write_value(Column<T>& column1,T value) {
+    std::int64_t write_value(Column& column1,T value) {
         Tuple new_tuple(column1.last_id + 1, value);
         bool worked = write(column1, new_tuple);
         if (worked) {
@@ -106,12 +138,12 @@ namespace column {
 
     // TODO make it handle invalid ids
     template<typename T>
-    T read_value(Column<T>& column1, std::int64_t id) {
-        return *value_at_id(column1, id);
+    T read_value(Column& column1, std::int64_t id) {
+        return *value_at_id<T>(column1, id);
     }
 
     template<typename T>
-    T *value_at_id(Column<T>& column1, std::int64_t id) {
+    T *value_at_id(Column& column1, std::int64_t id) {
         auto *mapped_cast = (std::int8_t *) column1.mapped;
         auto length_tuple = sizeof(std::int64_t) + sizeof(T);
         auto offset = id * length_tuple;
@@ -124,13 +156,13 @@ namespace column {
 
 
     template<typename T>
-    void read_all(Column<T>& column1) {
+    void read_all(Column& column1) {
         // TODO make work with templates
         std::cout << "id\tvalue" << std::endl;
         auto length_tuple = sizeof(T) + sizeof(std::int64_t);
         for (int i = 0; i <= column1.last_id; ++i) {
             std::cout << i << "\t";
-            std::cout << value_at_id(column1, i) << std::endl;
+            std::cout << value_at_id<T>(column1, i) << std::endl;
         }
     }
 

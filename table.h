@@ -12,7 +12,7 @@
 
 class Table {
 public:
-    std::pair<column::Column<std::int64_t>, column::Column<double>> columns;
+    std::pair<column::Column, column::Column> columns;
     Table();
 
     std::int64_t insert_values(std::int64_t value_1, double value_2);

@@ -14,13 +14,13 @@ bool is_number(const std::string &s) {
 }
 
 void repl_loop() {
-    column::Column<std::int64_t> column("score");
+    column::Column column("score", column::INT_64);
     std::cout << "schreibe i um einen wert zu schreiben, schreibe r um alle gespeicherten werte und ihre ids auszugeben." << std::endl;
     while (true) {
         std::string repl_input;
         std::cin >> repl_input;
         if (repl_input == "r") {
-            column::read_all(column);
+            column::read_all<std::int64_t>(column);
         }
         if (repl_input == "i") {
             std::cout << "gebe den zu speichernden wert ein." << std::endl;

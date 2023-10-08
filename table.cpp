@@ -4,7 +4,7 @@
 
 #include "table.h"
 
-Table::Table(): columns(column::Column<std::int64_t>("table_int64"), column::Column<double>("table_double")) {
+Table::Table(): columns(column::Column("table_int64", column::INT_64), column::Column("table_double", column::FLOAT_64)) {
 }
 
 std::int64_t Table::insert_values(std::int64_t value_1, double value_2) {
