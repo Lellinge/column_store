@@ -5,6 +5,7 @@
 #ifndef COLUMN_STORE_TABLE_H
 #define COLUMN_STORE_TABLE_H
 
+#include <vector>
 
 #include "column.h"
 
@@ -12,8 +13,11 @@
 
 class Table {
 public:
-    std::pair<column::Column, column::Column> columns;
-    Table();
+    std::string name;
+    std::vector<column::Column> columns;
+
+
+    Table(std::string name, std::vector<column::COLUMN_DATATYPES> columns);
 
     std::int64_t insert_values(std::int64_t value_1, double value_2);
 

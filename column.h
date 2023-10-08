@@ -37,6 +37,8 @@ namespace column {
         FLOAT_32,
         INT_8
     };
+    
+    std::string datatype_to_str(COLUMN_DATATYPES type);
 
 
     class Column {

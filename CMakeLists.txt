@@ -20,12 +20,15 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 
-add_executable(column_store main.cpp table.cpp)
+add_executable(column_store main.cpp table.cpp
+        column.cpp)
 
-add_executable(column_test column_test.cpp)
+add_executable(column_test column_test.cpp
+        column.cpp)
 target_link_libraries(column_test GTest::gtest_main)
 
-add_executable(table_test table_test.cpp table.cpp)
+add_executable(table_test table_test.cpp table.cpp
+        column.cpp)
 target_link_libraries(table_test GTest::gtest_main)
 
 include(GoogleTest)
