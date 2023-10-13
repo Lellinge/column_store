@@ -157,6 +157,7 @@ namespace column {
     }
 
 
+
     template<typename T>
     void read_all(Column& column1) {
         // TODO make work with templates
@@ -167,6 +168,7 @@ namespace column {
             std::cout << value_at_id<T>(column1, i) << std::endl;
         }
     }
+
 
 
 }
