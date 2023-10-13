@@ -11,7 +11,6 @@ std::int64_t Table::insert_values(std::vector<DB_Value> values) {
         std::cout << "tried to pass in a number of values which doesnt match the number of columns." << std::endl;
         return -1;
     }
-    // TODO check if sizes mathc
     for (int i = 0; i < values.size(); ++i)  {
         switch (values.at(i).type) {
             case column::INT_64:
@@ -55,29 +54,11 @@ void Table::read_all() {
     }
 }
 
-DB_Value read_value_column_as_DB_Val(column::Column& column1, std::int64_t id) {
-    switch (column1.type) {
-
-        case column::INT_64:
-
-            break;
-        case column::FLOAT_64:
-            break;
-        case column::INT_32:
-            break;
-        case column::FLOAT_32:
-            break;
-        case column::INT_8:
-            break;
-    }
-}
-
 std::vector<DB_Value> Table::read_value(std::int64_t id) {
     std::vector<DB_Value> values;
     for (int i = 0; i < columns.size(); ++i) {
         DB_Value val;
-        DB_val_content content;
-        this->columns.at(i);
+        DB_val_content content{};
         switch (columns.at(i).type) {
             case column::INT_64:
                 content.INT_64  = column::read_value<std::int64_t>(this->columns.at(i), id);
