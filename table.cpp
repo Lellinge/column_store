@@ -73,35 +73,35 @@ DB_Value read_value_column_as_DB_Val(column::Column& column1, std::int64_t id) {
 }
 
 std::vector<DB_Value> Table::read_value(std::int64_t id) {
+    std::vector<DB_Value> values;
     for (int i = 0; i < columns.size(); ++i) {
         DB_Value val;
+        DB_val_content content;
         this->columns.at(i);
         switch (columns.at(i).type) {
             case column::INT_64:
-                auto temp_int64  = column::read_value<std::int64_t>(this->columns.at(i), id);
-                val = create_db_value<std::int64_t>(temp_int64);
+                content.INT_64  = column::read_value<std::int64_t>(this->columns.at(i), id);
+                val = create_db_value<std::int64_t>(content.INT_64);
                 break;
             case column::FLOAT_64:
-                auto temp_double = column::read_value<double>(this->columns.at(i), id);
-                val = create_db_value<double>(temp_double);
+                content.FLOAT_64 = column::read_value<double>(this->columns.at(i), id);
+                val = create_db_value<double>(content.FLOAT_64);
                 break;
             case column::INT_32:
+                content.INT_32 = column::read_value<int32_t>(this->columns.at(i), id);
+                val = create_db_value<int32_t>(content.INT_32);
                 break;
             case column::FLOAT_32:
+                content.FLOAT_32 = column::read_value<float>(this->columns.at(i), id);
+                val = create_db_value<float>(content.FLOAT_32);
                 break;
             case column::INT_8:
+                content.INT_8 = column::read_value<int8_t>(this->columns.at(i), id);
                 break;
         }
+        values.push_back(val);
     }
-    auto value_1 = column::read_value<std::int64_t>(columns[0], id);
-    auto value_2 = column::read_value<double>(columns[1], id);
-    DB_Value dbValue_1;
-    DB_Value dbValue_2;
-    dbValue_1.content.INT_64 = value_1;
-    dbValue_1.type = column::INT_64;
-    dbValue_2.content.FLOAT_64 = value_2;
-    dbValue_2.type = column::FLOAT_64;
-    return std::vector<DB_Value>{dbValue_1, dbValue_2};
+    return values;
 }
 
 Table::Table(const std::string& name, const std::vector<column::COLUMN_DATATYPES>& columns_new) {
