@@ -8,12 +8,12 @@
 
 TEST(TABLE, BASIC_INSERT) {
     Table table("testtable", std::vector<column::COLUMN_DATATYPES>{column::INT_64, column::FLOAT_64});
-    DB_Value value_1{DB_val_content{1}, column::INT_64};
-    DB_Value value_2{DB_val_content{2.5L}, column::FLOAT_64};
-    DB_Value value_3{DB_val_content{6587}, column::INT_64};
-    DB_Value value_4{DB_val_content{345.2345}, column::FLOAT_64};
-    DB_Value value_5{DB_val_content{-2143}, column::INT_64};
-    DB_Value value_6{DB_val_content{-3452.5}, column::FLOAT_64};
+    auto value_1 = create_db_value<std::int64_t>(1);
+    auto value_2 = create_db_value<double>(2.5);
+    auto value_3 = create_db_value<std::int64_t>(6587);
+    auto value_4 = create_db_value<double>(345.2345);
+    auto value_5 = create_db_value<std::int64_t>(-2143);
+    auto value_6 = create_db_value<double>(-3452.5);
     EXPECT_NE(table.insert_values(std::vector<DB_Value>{value_1, value_2}), -1);
     EXPECT_NE(table.insert_values(std::vector<DB_Value>{value_3, value_4}), -1);
     EXPECT_NE(table.insert_values(std::vector<DB_Value>{value_4, value_5}), -1);
