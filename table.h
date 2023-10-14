@@ -40,6 +40,8 @@ public:
     void read_all();
 
     std::vector<DB_Value> read_value(std::int64_t id);
+
+    std::vector<std::int64_t> bigger_than(int column, DB_Value value);
 };
 
 

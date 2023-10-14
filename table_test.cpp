@@ -22,6 +22,10 @@ TEST(TABLE, BASIC_INSERT) {
 TEST(TABLE, READ_ALL) {
     Table table("testtable", std::vector<column::COLUMN_DATATYPES>{column::INT_64, column::FLOAT_64});
     table.read_all();
+    auto returned = table.bigger_than(0, create_db_value<std::int64_t>(100));
+    for (auto&& id : returned) {
+        std::cout << "got value: " << table.read_value(id)[0].content.INT_64 << std::endl;
+    }
 }
 
 TEST(TABLE, INSERT_AND_READ_BACK)  {
@@ -40,5 +44,13 @@ TEST(TABLE, INSERT_AND_READ_BACK)  {
     auto value_2 = table.read_value(row_id);
     EXPECT_EQ(value_2[0].content.INT_64, 234);
     EXPECT_NEAR(value_2[1].content.FLOAT_64, 345.87, 0.1);
+}
+
+TEST(TABLE, BIGGER_THAN) {
+    Table table("testtable", std::vector<column::COLUMN_DATATYPES>{column::INT_64, column::FLOAT_64});
+    auto returned = table.bigger_than(0, create_db_value<std::int64_t>(100));
+    for (auto&& id : returned) {
+        EXPECT_GT(table.read_value(id)[0].content.INT_64, 100);
+    }
 }
 

@@ -14,6 +14,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <vector>
 
 namespace column {
 
@@ -169,7 +170,17 @@ namespace column {
         }
     }
 
-
+    template<typename T>
+    std::vector<std::int64_t> bigger_than(Column& column1, T value) {
+        std::vector<std::int64_t> ret_vect;
+        for (int i = 0; i <= column1.get_last_id(); ++i) {
+            auto val = value_at_id<T>(column1, i);
+            if (*val > value) {
+                ret_vect.push_back(i);
+            }
+        }
+        return ret_vect;
+    }
 
 }
 

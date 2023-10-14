@@ -104,6 +104,33 @@ Table::Table(const std::string& name, const std::vector<column::COLUMN_DATATYPES
     }
 }
 
+std::vector<std::int64_t> Table::bigger_than(int column_index, DB_Value value) {
+    auto& column_to_search = columns.at(column_index);
+    if (column_to_search.type != value.type) {
+        std::cout << "type von DB_value passt nicht zum type von der column." << std::endl;
+        return {};
+    }
+    switch (column_to_search.type) {
+
+        case column::INT_64:
+            return column::bigger_than(column_to_search, value.content.INT_64);
+            break;
+        case column::FLOAT_64:
+            return column::bigger_than(column_to_search, value.content.FLOAT_64);
+            break;
+        case column::INT_32:
+            return column::bigger_than(column_to_search, value.content.INT_32);
+            break;
+        case column::FLOAT_32:
+            return column::bigger_than(column_to_search, value.content.FLOAT_32);
+            break;
+        case column::INT_8:
+            return column::bigger_than(column_to_search, value.content.INT_8);
+            break;
+    }
+
+}
+
 DB_Value::DB_Value(DB_val_content content, column::COLUMN_DATATYPES type) {
     this->content = content;
     this->type = type;
