@@ -17,7 +17,11 @@ ENDIF ()
 
 FetchContent_MakeAvailable(googletest)
 
+
 enable_testing()
+
+add_subdirectory(pybind11)
+
 
 
 add_executable(column_store main.cpp table.cpp
@@ -35,3 +39,4 @@ include(GoogleTest)
 gtest_discover_tests(column_test)
 
 
+pybind11_add_module(pystore pymodule.cpp table.h table.cpp column.cpp column.h)
