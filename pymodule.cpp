@@ -3,6 +3,7 @@
 //
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "table.h"
 
@@ -19,7 +20,9 @@ PYBIND11_MODULE(pystore, mod) {
 
 
     py::class_<DB_Value>(mod, "db_value")
-            .def(py::init<DB_val_content, column::COLUMN_DATATYPES>());
+            .def(py::init<DB_val_content, column::COLUMN_DATATYPES>())
+            .def_readwrite("content", &DB_Value::content, "the union representing the content of the db_value")
+            .def_readwrite("type", &DB_Value::type, "the type of the data in the union");
 
     py::enum_<column::COLUMN_DATATYPES>(mod, "column_datatypes")
             .value("INT_64", column::COLUMN_DATATYPES::INT_64)
@@ -63,4 +66,20 @@ PYBIND11_MODULE(pystore, mod) {
                 self.INT_8 = value;
             });
 
+    py::class_<column::Column>(mod, "column")
+            .def(py::init<const std::string, column::COLUMN_DATATYPES>())
+            .def("get_last_id", &column::Column::get_last_id);
+
+    py::class_<Table>(mod, "table")
+            .def(py::init<const std::string&, const std::vector<column::COLUMN_DATATYPES>&>())
+            .def_readonly("name", &Table::name)
+            .def("read_all", &Table::read_all, "read all the values in a table.")
+            .def("insert_values", &Table::insert_values, "insert a row of values in the table. ")
+            .def("read_value", &Table::read_value, "read a row from the table");
+
+    mod.def("create_db_value_int64", &create_db_value<std::int64_t>, "create a db_value with a 64 bit int as content");
+    mod.def("create_db_value_int32", &create_db_value<std::int32_t>, "create a db_value with a 32 bit int as content");
+    mod.def("create_db_value_int8", &create_db_value<std::int8_t>, "create a db_value with a 8 bit int as content");
+    mod.def("create_db_value_float64", &create_db_value<double>, "create a db_value with a 64 bit float as content");
+    mod.def("create_db_value_float32", &create_db_value<float>, "create a db_value with a 32 bit float as content");
 }
