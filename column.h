@@ -71,7 +71,7 @@ namespace column {
                 std::cout << "fstat failed." << std::endl;
             }
 
-            this->mapped = mmap(nullptr, statbuf.st_size, PROT_READ, MAP_SHARED, fd_int, 0);
+            this->mapped = mmap(nullptr, statbuf.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd_int, 0);
             if (mapped == MAP_FAILED) {
                 std::cout << std::strerror(errno) << std::endl;
                 std::cout << "failed to mmap " << std::endl;
@@ -106,6 +106,29 @@ namespace column {
 
         [[nodiscard]] std::int64_t get_last_id() const {
             return this->last_id;
+        }
+
+        void msync() {
+            auto size_tuple = sizeof(std::int64_t);
+            switch (type) {
+
+                case INT_64:
+                    size_tuple += sizeof(std::int64_t);
+                    break;
+                case FLOAT_64:
+                    size_tuple += sizeof(double);
+                    break;
+                case INT_32:
+                    size_tuple += sizeof(std::int32_t);
+                    break;
+                case FLOAT_32:
+                    size_tuple += sizeof(float);
+                    break;
+                case INT_8:
+                    size_tuple += sizeof(std::int8_t);
+                    break;
+            }
+            ::msync(mapped, size_tuple * (last_id + 1), MS_SYNC);
         }
     };
 
@@ -180,6 +203,20 @@ namespace column {
             }
         }
         return ret_vect;
+    }
+
+    template<typename T>
+    bool update(Column& column1, T value, std::int64_t id) {
+        auto *mapped_cast = (std::int8_t*) column1.mapped;
+        auto length_tuple = sizeof(std::int64_t) + sizeof(T);
+        auto offset = id * length_tuple;
+        std::int8_t* address_of_id = mapped_cast + offset;
+        auto address_of_id_cast = (std::int64_t*) address_of_id;
+        auto address_of_value = address_of_id_cast + 1;
+        *address_of_value = value;
+
+        column1.msync();
+        return true;
     }
 
 }

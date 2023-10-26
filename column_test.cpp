@@ -28,6 +28,15 @@ TEST(COLUMN, INSERT_AND_READ_BACK) {
     EXPECT_EQ(value, 435);
 }
 
+TEST(COLUMN, INSERT_UPDATE_READ_BACK) {
+    column::Column test_column("score", column::INT_64);
+    auto row_id = column::write_value<std::int64_t>(test_column, 555);
+    bool worked = column::update<std::int64_t>(test_column, 333, row_id);
+    EXPECT_EQ(worked, true);
+    auto value = column::read_value<std::int64_t>(test_column, row_id);
+    EXPECT_EQ(value, 333);
+}
+
 TEST(COLUMN, DOUBLE_BASIC_INSERT) {
     column::Column test_colum("double", column::FLOAT_64);
     EXPECT_NE(column::write_value<double>(test_colum, 5678.3456), -1);
