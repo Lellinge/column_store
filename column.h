@@ -21,12 +21,9 @@ namespace column {
     template<typename T>
     class Tuple {
     public:
-        Tuple(std::int64_t id, T value) {
-            this->id = id;
+        Tuple(T value) {
             this->value = value;
         }
-
-        std::int64_t id;
         T value;
     };
 
@@ -77,7 +74,7 @@ namespace column {
                 std::cout << "failed to mmap " << std::endl;
                 return;
             }
-            auto length_tuple = sizeof(std::int64_t);
+            auto length_tuple = 0;
             switch (type) {
 
                 case INT_64:
@@ -109,7 +106,7 @@ namespace column {
         }
 
         void msync() {
-            auto size_tuple = sizeof(std::int64_t);
+            auto size_tuple = 0;
             switch (type) {
 
                 case INT_64:
@@ -134,7 +131,7 @@ namespace column {
 
     template<typename T>
     bool write(Column& column1, Tuple<T> tuple) {
-        auto size_tuple = sizeof(std::int64_t) + sizeof(T);
+        auto size_tuple = sizeof(T);
         auto write_ret = ::write(column1.fd_int, &tuple, size_tuple);
         // write gibt die anzahl an geschriebenen bytes zurück. es sollten immer 16 sein.
         if (write_ret != size_tuple) {
@@ -153,7 +150,7 @@ namespace column {
 
     template<typename T>
     std::int64_t write_value(Column& column1,T value) {
-        Tuple new_tuple(column1.last_id + 1, value);
+        Tuple new_tuple(value);
         bool worked = write(column1, new_tuple);
         if (worked) {
             return column1.last_id;
@@ -171,12 +168,11 @@ namespace column {
     template<typename T>
     T *value_at_id(Column& column1, std::int64_t id) {
         auto *mapped_cast = (std::int8_t *) column1.mapped;
-        auto length_tuple = sizeof(std::int64_t) + sizeof(T);
+        auto length_tuple = sizeof(T);
         auto offset = id * length_tuple;
         std::int8_t *address_of_id = mapped_cast + offset;
-        auto addres_of_id_cast = (std::int64_t *) address_of_id;
-        auto address_of_value = addres_of_id_cast + 1;
-        T *value = ((T *) address_of_value);
+        T* address_of_value = (T *) address_of_id;
+        T *value = address_of_value;
         return value;
     }
 
@@ -208,12 +204,10 @@ namespace column {
     template<typename T>
     bool update(Column& column1, T value, std::int64_t id) {
         auto *mapped_cast = (std::int8_t*) column1.mapped;
-        auto length_tuple = sizeof(std::int64_t) + sizeof(T);
+        auto length_tuple = sizeof(T);
         auto offset = id * length_tuple;
-        std::int8_t* address_of_id = mapped_cast + offset;
-        auto address_of_id_cast = (std::int64_t*) address_of_id;
-        auto address_of_value_int64= address_of_id_cast + 1;
-        T* address_of_value = (T*) address_of_value_int64;
+        T *address_of_value;
+        address_of_value = (T*) (mapped_cast + offset);
 
         *address_of_value = value;
 
