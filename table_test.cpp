@@ -54,3 +54,20 @@ TEST(TABLE, BIGGER_THAN) {
     }
 }
 
+TEST(TABLE, INSERT_AND_UPDATE) {
+    Table table("testtable", std::vector<column::COLUMN_DATATYPES>{column::INT_64, column::FLOAT_64});
+    DB_Value val_1 = create_db_value<std::int64_t>(234);
+    DB_Value val_2 = create_db_value<double>(345.87);
+    auto row_id = table.insert_values(std::vector<DB_Value>{val_1, val_2});
+    DB_Value up_val_1 = create_db_value<std::int64_t>(3456);
+    DB_Value up_val_2 = create_db_value<double>(234.234);
+    auto row_id_up = table.update_values(std::vector<DB_Value>{up_val_1, up_val_2}, row_id);
+    // Did the update suceed?
+    EXPECT_NE(row_id_up, -1);
+
+    auto values = table.read_value(row_id_up);
+    EXPECT_EQ(values.at(0).content.INT_64, 3456);
+    EXPECT_EQ(values.at(1).content.FLOAT_64, 234.234);
+
+}
+

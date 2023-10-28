@@ -212,7 +212,9 @@ namespace column {
         auto offset = id * length_tuple;
         std::int8_t* address_of_id = mapped_cast + offset;
         auto address_of_id_cast = (std::int64_t*) address_of_id;
-        auto address_of_value = address_of_id_cast + 1;
+        auto address_of_value_int64= address_of_id_cast + 1;
+        T* address_of_value = (T*) address_of_value_int64;
+
         *address_of_value = value;
 
         column1.msync();

@@ -131,6 +131,34 @@ std::vector<std::int64_t> Table::bigger_than(int column_index, DB_Value value) {
 
 }
 
+std::int64_t Table::update_values(std::vector<DB_Value> values, std::int64_t id) {
+    if (values.size() != columns.size()) {
+        std::cout << "tried to pass in a number of values which doesnt match the number of columns." << std::endl;
+        return -1;
+    }
+    for (int i = 0; i < values.size(); ++i) {
+        switch (values.at(i).type) {
+
+            case column::INT_64:
+                column::update<std::int64_t>(this->columns.at(i), values.at(i).content.INT_64, id);
+                break;
+            case column::FLOAT_64:
+                column::update<double>(this->columns.at(i), values.at(i).content.FLOAT_64, id);
+                break;
+            case column::INT_32:
+                column::update<std::int32_t>(this->columns.at(i), values.at(i).content.INT_32, id);
+                break;
+            case column::FLOAT_32:
+                column::update<float>(this->columns.at(i), values.at(i).content.FLOAT_32, id);
+                break;
+            case column::INT_8:
+                column::update<std::int8_t>(this->columns.at(i), values.at(i).content.INT_8, id);
+                break;
+        }
+    }
+    return id;
+}
+
 DB_Value::DB_Value(DB_val_content content, column::COLUMN_DATATYPES type) {
     this->content = content;
     this->type = type;

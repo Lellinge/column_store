@@ -37,6 +37,8 @@ public:
 
     std::int64_t insert_values(std::vector<DB_Value> values);
 
+    std::int64_t update_values(std::vector<DB_Value> values, std::int64_t id);
+
     void read_all();
 
     std::vector<DB_Value> read_value(std::int64_t id);
