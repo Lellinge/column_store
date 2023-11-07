@@ -159,6 +159,10 @@ std::int64_t Table::update_values(std::vector<DB_Value> values, std::int64_t id)
     return id;
 }
 
+std::int64_t Table::get_last_id() {
+    return columns.at(0).get_last_id();
+}
+
 DB_Value::DB_Value(DB_val_content content, column::COLUMN_DATATYPES type) {
     this->content = content;
     this->type = type;
